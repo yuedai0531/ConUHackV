@@ -11,27 +11,42 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 video_capture = cv2.VideoCapture(0)
 anterior = 0
 
-while True:
-    if not video_capture.isOpened():
+while True:  # Infinite loop to get video, create bounding box,
+    if not video_capture.isOpened():  # If webcam is not working
         print('Unable to load camera.')
         sleep(5)
         pass
 
     # Capture frame-by-frame
-    ret, frame = video_capture.read()
+    ret, frame = video_capture.read()  # Take frame from webcam
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # converts to grayscale
 
-    faces = faceCascade.detectMultiScale(
+    faces = faceCascade.detectMultiScale(  # Detects faces, stores the coordinates of the faces for boxes
         gray,
         scaleFactor=1.1,
         minNeighbors=5,
         minSize=(30, 30)
     )
 
-    # Draw a rectangle around the faces
+    # Find the biggest face, will be closest user
+    max_area = 0
+    biggest_face = None
     for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        area = w * h
+        if area > max_area:
+            max_area = area
+            biggest_face = (x, y, w, h)
+
+    if biggest_face is not None:
+        biggest_face_frame = frame[y:y+h, x:x+w]
+        cv2.imwrite("image.jpg", biggest_face_frame)
+        # acs.send("image.jpg")
+
+        # Draw a rectangle around the biggest face
+        (x, y, w, h) = (biggest_face[0], biggest_face[1], biggest_face[2], biggest_face[3])
+        (cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2))
+
 
     if anterior != len(faces):
         anterior = len(faces)
@@ -47,6 +62,8 @@ while True:
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
+
+    sleep(30)
 
 # When everything is done, release the capture
 video_capture.release()
