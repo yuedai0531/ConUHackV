@@ -47,7 +47,6 @@ while True:  # Infinite loop to get video, create bounding box,
         (x, y, w, h) = (biggest_face[0], biggest_face[1], biggest_face[2], biggest_face[3])
         (cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2))
 
-
     if anterior != len(faces):
         anterior = len(faces)
         log.info("faces: "+str(len(faces))+" at "+str(dt.datetime.now()))
@@ -62,8 +61,6 @@ while True:  # Infinite loop to get video, create bounding box,
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
-
-    sleep(30)
 
 # When everything is done, release the capture
 video_capture.release()
