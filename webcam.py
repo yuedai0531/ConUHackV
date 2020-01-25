@@ -38,14 +38,15 @@ while True:  # Infinite loop to get video, create bounding box,
             max_area = area
             biggest_face = (x, y, w, h)
 
-    # if biggest_face is not None:
-    #     biggest_face_frame = frame[y:y+h, x:x+w]
-    #     cv2.imwrite("image.jpg", biggest_face_frame)
-    #     # acs.send("image.jpg")
+    if biggest_face is not None:
+        biggest_face_frame = frame[y:y+h, x:x+w]
+        cv2.imwrite("image.jpg", biggest_face_frame)
+        # acs.send("image.jpg")
 
-    # Draw a rectangle around the biggest face
-    for (x, y, w, h) in biggest_face:
+        # Draw a rectangle around the biggest face
+        (x, y, w, h) = (biggest_face[0], biggest_face[1], biggest_face[2], biggest_face[3])
         (cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2))
+
 
     if anterior != len(faces):
         anterior = len(faces)
@@ -62,7 +63,7 @@ while True:  # Infinite loop to get video, create bounding box,
     # Display the resulting frame
     cv2.imshow('Video', frame)
 
-    # sleep(30)
+    sleep(30)
 
 # When everything is done, release the capture
 video_capture.release()
