@@ -1,10 +1,5 @@
 webcam.log
 
-<<<<<<< HEAD
-GCapikey.json
-
-.idea
-=======
 secrets.py
 image.jpg
 
@@ -139,4 +134,6 @@ dmypy.json
 .pyre/
 
 .idea/
->>>>>>> afd410dc7784e1c9bc192a482ffcddc72440edf2
+
+
+GCapikey.json
