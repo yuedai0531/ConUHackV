@@ -5,3 +5,6 @@ Install cv dependencies \
 
 Then to run \
 `python webcam.py haarcascade_frontalface_default.xml`
+
+
+`export GOOGLE_APPLICATION_CREDENTIALS="/Users/yuedai/Documents/ConUHackV/GCapikey.json"`
