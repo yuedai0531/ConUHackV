@@ -26,9 +26,7 @@ while True:  # Infinite loop to get video, create bounding box,
 
     # Capture frame-by-frame
     ret, frame = video_capture.read()  # Take frame from webcam
-
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # converts to grayscale
-
     faces = faceCascade.detectMultiScale(  # Detects faces, stores the coordinates of the faces for boxes
         gray,
         scaleFactor=1.1,
@@ -39,10 +37,15 @@ while True:  # Infinite loop to get video, create bounding box,
     for (x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
+    # Display the resulting frame
+    cv2.imshow('Video', frame)
+
     # If faces are detected, send the api call with the biggest face found
     # API call only runs once every five seconds at most
     curtime = dt.datetime.now()
-    if (len(faces) != 0) and (abs((prevtime-curtime).total_seconds()) > 4):
+    # print(abs((prevtime - curtime).total_seconds()))
+    if (len(faces) != 0) and (abs((prevtime-curtime).total_seconds()) > 5):
+        print(abs((prevtime - curtime).total_seconds()))
         prevtime = curtime
         # Find the biggest face, will be closest user
         max_area = 0
@@ -69,7 +72,7 @@ while True:  # Infinite loop to get video, create bounding box,
         # Send jpg to azure cognitive services and get the faceattributes
         image_directory = os.path.dirname(__file__) + '/image.jpg'
         response = send(image_directory)
-        print(response)
+        # print(response)
         if response:
             face_attributes = response[0]['faceAttributes']
             emotion = face_attributes['emotion']
@@ -77,25 +80,12 @@ while True:  # Infinite loop to get video, create bounding box,
 
         response = None
 
-    # Display the resulting frame
-    cv2.imshow('Video', frame)
-
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    #
+    # response = None
 
-    # Send jpg to azure cognitive services and get the faceattributes
-    image_directory = os.path.dirname(__file__) + 'image.jpg'
-    print(image_directory)
-    response = send(image_directory)
-    if response:
-        face_attributes = response[0]['faceAttributes']
-        emotion = face_attributes['emotion']
-        print(emotion)
-    # detect_faces(image_directory)
 
-    sleep(1)
-
-    response = None
 
 # When everything is done, release the capture
 video_capture.release()
