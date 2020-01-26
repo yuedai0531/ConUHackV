@@ -3,6 +3,11 @@ import sys
 import logging as log
 import datetime as dt
 from time import sleep
+from acs import send
+import os
+from emotions import detect_faces
+import datetime as dt
+from datetime import timedelta
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -10,6 +15,8 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 
 video_capture = cv2.VideoCapture(0)
 anterior = 0
+
+prevtime = dt.datetime.now()
 
 while True:  # Infinite loop to get video, create bounding box,
     if not video_capture.isOpened():  # If webcam is not working
@@ -29,38 +36,66 @@ while True:  # Infinite loop to get video, create bounding box,
         minSize=(30, 30)
     )
 
-    # Find the biggest face, will be closest user
-    max_area = 0
-    biggest_face = None
     for (x, y, w, h) in faces:
-        area = w * h
-        if area > max_area:
-            max_area = area
-            biggest_face = (x, y, w, h)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-    if biggest_face is not None:
-        biggest_face_frame = frame[y:y+h, x:x+w]
-        cv2.imwrite("image.jpg", biggest_face_frame)
-        # acs.send("image.jpg")
+    # If faces are detected, send the api call with the biggest face found
+    # API call only runs once every five seconds at most
+    curtime = dt.datetime.now()
+    if (len(faces) != 0) and (abs((prevtime-curtime).total_seconds()) > 4):
+        prevtime = curtime
+        # Find the biggest face, will be closest user
+        max_area = 0
+        biggest_face = None
+        for (x, y, w, h) in faces:
+            area = w * h
+            if area > max_area:
+                max_area = area
+                biggest_face = (x, y, w, h)
 
-        # Draw a rectangle around the biggest face
-        (x, y, w, h) = (biggest_face[0], biggest_face[1], biggest_face[2], biggest_face[3])
-        (cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2))
+        if biggest_face is not None:
+            biggest_face_frame = frame[y:y+h, x:x+w]
+            cv2.imwrite("image.jpg", biggest_face_frame)
+            # acs.send("image.jpg")q
 
-    if anterior != len(faces):
-        anterior = len(faces)
-        log.info("faces: "+str(len(faces))+" at "+str(dt.datetime.now()))
+            # Draw a rectangle around the biggest face
+            (x, y, w, h) = (biggest_face[0], biggest_face[1], biggest_face[2], biggest_face[3])
+            (cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2))
 
+        if anterior != len(faces):
+            anterior = len(faces)
+            log.info("faces: "+str(len(faces))+" at "+str(dt.datetime.now()))
+
+        # Send jpg to azure cognitive services and get the faceattributes
+        image_directory = os.path.dirname(__file__) + '/image.jpg'
+        response = send(image_directory)
+        print(response)
+        if response:
+            face_attributes = response[0]['faceAttributes']
+            emotion = face_attributes['emotion']
+            print(emotion)
+
+        response = None
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
-
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    # Display the resulting frame
-    cv2.imshow('Video', frame)
+    # Send jpg to azure cognitive services and get the faceattributes
+    image_directory = os.path.dirname(__file__) + 'image.jpg'
+    print(image_directory)
+    response = send(image_directory)
+    if response:
+        face_attributes = response[0]['faceAttributes']
+        emotion = face_attributes['emotion']
+        print(emotion)
+    # detect_faces(image_directory)
+
+    sleep(1)
+
+    response = None
 
 # When everything is done, release the capture
 video_capture.release()

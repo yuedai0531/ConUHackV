@@ -1,6 +1,7 @@
 import requests
 import json
 import secrets
+import os
 
 subscription_key = secrets.subscription_key
 assert subscription_key
@@ -22,3 +23,8 @@ def send(path):
     response = requests.post(face_api_url, params=params,
                             headers=headers, data=data)
     return response.json()
+
+if __name__=='__main__':
+    image_directory = os.path.dirname(__file__) + 'image.jpg'
+    response = send(image_directory)
+    print(response)
