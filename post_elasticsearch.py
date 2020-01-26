@@ -4,7 +4,7 @@ from requests.auth import HTTPBasicAuth
 
 def data_generation(json_object):
     es_url = "https://e54e0b68099e4fb7b4af7f6ab3ea778e.us-east-1.aws.found.io:9243"
-    doc_index = "sentiment_flow_generated3"
+    doc_index = "sentiment_flow_generated4"
     doc_type = "data"
 
     headers = {
