@@ -49,7 +49,7 @@ while True:  # Infinite loop to get video, create bounding box,
 
         sum_dict = {'anger': 0.0, 'contempt': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happiness': 0.0, 'neutral': 0.0, 'sadness': 0.0, 'surprise': 0.0}
         # Send jpg to azure cognitive services and get the faceattributes
-        image_directory = os.path.dirname(__file__) + '/image.jpg'
+        image_directory = os.path.dirname(__file__) + 'image.jpg'
         response = send(image_directory)
         if response:
             faces = response

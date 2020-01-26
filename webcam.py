@@ -70,7 +70,7 @@ while True:  # Infinite loop to get video, create bounding box,
             log.info("faces: "+str(len(faces))+" at "+str(dt.datetime.now()))
 
         # Send jpg to azure cognitive services and get the faceattributes
-        image_directory = os.path.dirname(__file__) + '/image.jpg'
+        image_directory = os.path.dirname(__file__) + 'image.jpg'
         response = send(image_directory)
         # print(response)
         if response:
