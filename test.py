@@ -37,6 +37,7 @@ for i in range(0, 2100):
                 "timestamp":    datetime.fromtimestamp(datetime.now().timestamp() - 250 * (2100 - i)).isoformat()
             }
             data_generation(json_object)
+            print(i)
         elif 150<=i<200: #50 sads
             json_object = {
                 "sentiment":    "sadness",
@@ -56,6 +57,7 @@ for i in range(0, 2100):
             }
             data_generation(json_object)
 
+    print(i)
 
     if 300<=i<600: #day2
         if 300<=i<400: #100 happies
@@ -82,7 +84,7 @@ for i in range(0, 2100):
                 "timestamp":    datetime.fromtimestamp(datetime.now().timestamp() - 250 * (2100 - i)).isoformat()
             }
             data_generation(json_object)
-
+    print(i)
 
     if 600<=i<900: #day3
         if 600<=i<710: #100 happies
@@ -110,6 +112,7 @@ for i in range(0, 2100):
             }
             data_generation(json_object)
 
+    print(i)
 
     if 900<=i<1200: #day4
         if 900<=i<1010: #100 happies
@@ -137,7 +140,7 @@ for i in range(0, 2100):
             }
             data_generation(json_object)
 
-
+    print(i)
     if 1200<=i<1500: #day5
         if 1200<=i<1320: #100 happies
             json_object = {
@@ -164,8 +167,8 @@ for i in range(0, 2100):
             }
             data_generation(json_object)
 
-
-    if 1500<=i<1800: #day1
+    print(i)
+    if 1500<=i<1800: #day6
         if 1500<=i<1650: #100 happies
             json_object = {
                 "sentiment":    "happiness",
@@ -190,8 +193,8 @@ for i in range(0, 2100):
                 "timestamp":    datetime.fromtimestamp(datetime.now().timestamp() - 250 * (2100 - i)).isoformat()
             }
             data_generation(json_object)
-
-        if 1800 <= i < 2100:  # day1
+        print(i)
+        if 1800 <= i < 2100:  # day7
             if 1800 <= i < 2000:  # 100 happies
                 json_object = {
                     "sentiment": "happiness",
