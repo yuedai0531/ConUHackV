@@ -8,6 +8,7 @@ import os
 from emotions import detect_faces
 import datetime as dt
 from datetime import timedelta
+from post_elasticsearch import data_generation
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -41,7 +42,6 @@ while True:  # Infinite loop to get video, create bounding box,
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
-
     try:
         # If faces are detected, send the api call with the biggest face found
         # API call only runs once every five seconds at most
@@ -82,7 +82,8 @@ while True:  # Infinite loop to get video, create bounding box,
 
                 response = None
 
-                # Remove neutral emotion. If any of the other emotions exceed the threshold value, send the emotion's key to Kibana
+                # Remove neutral emotion. If any of the other emotions exceed the threshold value,
+                # send the emotion's key to Kibana
                 del emotion['neutral']
                 max_emotion = 0
                 max_emotion_string = None
@@ -94,13 +95,16 @@ while True:  # Infinite loop to get video, create bounding box,
                 if max_emotion_string is not None:
                     print('You are feeling :' + max_emotion_string)
                     # Send the max_emotion_string to the kibana
+                    json_object = {
+                        "sentiment": max_emotion_string,
+                        "timestamp": dt.datetime.now().isoformat()
+                    }
+                    data_generation(json_object)
     except:
         print("API limit exhausted")
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
-
 
 
 # When everything is done, release the capture
