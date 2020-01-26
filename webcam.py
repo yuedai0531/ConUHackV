@@ -8,6 +8,7 @@ import os
 from emotions import detect_faces
 import datetime as dt
 from datetime import timedelta
+from post_elasticsearch import data_generation
 
 cascPath = "haarcascade_frontalface_default.xml"
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -79,27 +80,30 @@ while True:  # Infinite loop to get video, create bounding box,
             emotion = face_attributes['emotion']
             # print(emotion)
 
-        response = None
+            response = None
 
-        # Remove neutral emotion. If any of the other emotions exceed the threshold value, send the emotion's key to Kibana
-        del emotion['neutral']
-        max_emotion = 0
-        max_emotion_string = None
-        for key in emotion.keys():
-            if emotion[key] > max_emotion and emotion[key] > emotion_threshold:
-                max_emotion = emotion[key]
-                max_emotion_string = key
+            # Remove neutral emotion. If any of the other emotions exceed the threshold value, send the emotion's key to Kibana
+            del emotion['neutral']
+            max_emotion = 0
+            max_emotion_string = None
+            for key in emotion.keys():
+                if emotion[key] > max_emotion and emotion[key] > emotion_threshold:
+                    max_emotion = emotion[key]
+                    max_emotion_string = key
 
-        if max_emotion_string is not None:
-            print('You are feeling :' + max_emotion_string)
-            # Send the max_emotion_string to the kibana
+            if max_emotion_string is not None:
+                print('You are feeling :' + max_emotion_string)
+                # Send the max_emotion_string to the kibana
+                json_object = {
+                    "sentiment": max_emotion_string,
+                    "timestamp": dt.datetime.now().isoformat()
+                }
+                data_generation(json_object)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     #
     # response = None
-
-
 
 # When everything is done, release the capture
 video_capture.release()
