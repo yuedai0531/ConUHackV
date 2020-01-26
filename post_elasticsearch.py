@@ -18,4 +18,4 @@ def data_generation(json_object):
         auth=HTTPBasicAuth("elastic", "ieQEE5Q4UHVRDOwICsizTDSX"),
         json=json_object,
         headers=headers)
-    print(r.text)
+    # print(r.text)
