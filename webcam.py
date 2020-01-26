@@ -16,6 +16,8 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 video_capture = cv2.VideoCapture(0)
 anterior = 0
 
+emotion_threshold = 0.05
+
 prevtime = dt.datetime.now()
 
 while True:  # Infinite loop to get video, create bounding box,
@@ -43,9 +45,8 @@ while True:  # Infinite loop to get video, create bounding box,
     # If faces are detected, send the api call with the biggest face found
     # API call only runs once every five seconds at most
     curtime = dt.datetime.now()
-    # print(abs((prevtime - curtime).total_seconds()))
-    if (len(faces) != 0) and (abs((prevtime-curtime).total_seconds()) > 5):
-        print(abs((prevtime - curtime).total_seconds()))
+    if (len(faces) != 0) and (abs((prevtime-curtime).total_seconds()) > 4):
+
         prevtime = curtime
         # Find the biggest face, will be closest user
         max_area = 0
@@ -70,15 +71,28 @@ while True:  # Infinite loop to get video, create bounding box,
             log.info("faces: "+str(len(faces))+" at "+str(dt.datetime.now()))
 
         # Send jpg to azure cognitive services and get the faceattributes
-        image_directory = os.path.dirname(__file__) + 'image.jpg'
+        image_directory = os.path.dirname(__file__) + '/image.jpg'
         response = send(image_directory)
         # print(response)
         if response:
             face_attributes = response[0]['faceAttributes']
             emotion = face_attributes['emotion']
-            print(emotion)
+            # print(emotion)
 
         response = None
+
+        # Remove neutral emotion. If any of the other emotions exceed the threshold value, send the emotion's key to Kibana
+        del emotion['neutral']
+        max_emotion = 0
+        max_emotion_string = None
+        for key in emotion.keys():
+            if emotion[key] > max_emotion and emotion[key] > emotion_threshold:
+                max_emotion = emotion[key]
+                max_emotion_string = key
+
+        if max_emotion_string is not None:
+            print('You are feeling :' + max_emotion_string)
+            # Send the max_emotion_string to the kibana
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
